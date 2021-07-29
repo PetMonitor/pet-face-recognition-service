@@ -12,8 +12,6 @@ def generate_credentials():
         service_account_file = get_filename(CREDENTIALS_FILE_NAME)
         return service_account.Credentials.from_service_account_file(service_account_file, scopes=SCOPE)
 
-    for k, v in sorted(environ.items()):
-        print('PRINTING ENV VARIABLE {}'.format(k))    
     service_account_info = json.loads(environ['CREDENTIALS'])
     return service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPE)
 

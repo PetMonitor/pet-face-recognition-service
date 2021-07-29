@@ -4,7 +4,7 @@ from src.main.utils import Utils
 from src.main.drive import FileManager, Authenticator
 import tensorflow.keras.models as models
 
-DOGS_MODEL_PATH = "src/main/model/dogs/dog_facenet.h5"
+DOGS_MODEL_PATH = "src/main/model/dog_facenet.h5"
 #TODO: change this to fetch a file with the *.h5 extension
 #dogs_model = models.load_model("src/main/model/dogs/3.7.2021.h5", custom_objects={'triplet':Utils.triplet,'triplet_acc':Utils.triplet_acc})
 
