@@ -1,4 +1,5 @@
 Flask==2.0.1
+Flask-Script
 google-api-python-client
 google-auth
 Keras==2.4.3

@@ -9,7 +9,7 @@ def list_all_files():
     service = build('drive', 'v3', credentials=credentials)
     fileList = service.files().list().execute()
 
-    print('RESPONSE WAS {0}'.format(fileList))
+    #print('RESPONSE WAS {0}'.format(fileList))
     return fileList
 
 def get_file_ids_for_file_extension(extension):
@@ -29,4 +29,4 @@ def download_file(targetPath, fileId):
     done = False
     while done is False:
         status, done = downloader.next_chunk()
-        print('Download {}.', int(status.progress() * 100))
+        print('Download {}.'.format(int(status.progress() * 100)))

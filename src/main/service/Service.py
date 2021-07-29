@@ -1,16 +1,19 @@
 from flask import Flask, jsonify, redirect, request
+from flask_script import Manager, Server
 import json
 from src.main.utils import Utils
 from src.main.drive import FileManager, Authenticator
 import tensorflow.keras.models as models
 
 DOGS_MODEL_PATH = "src/main/model/dog_facenet.h5"
-#TODO: change this to fetch a file with the *.h5 extension
-#dogs_model = models.load_model("src/main/model/dogs/3.7.2021.h5", custom_objects={'triplet':Utils.triplet,'triplet_acc':Utils.triplet_acc})
 
 #TODO: add caching for embeddings cause they take some time to process
 
 app = Flask(__name__)
+manager = Manager(app)
+
+# Add the command to your Manager instance
+manager.add_command('runserver', CustomServer())
 
 @app.route("/")
 def hello_world():
@@ -56,8 +59,12 @@ def download_models():
     FileManager.download_file(DOGS_MODEL_PATH, modelFileIds[0])
     
 
-
+class CustomServer(Server):
+    def __call__(self, app, *args, **kwargs):
+        print("App started, downloading models from drive...")
+        download_models()
+        print("Model download finished!")
+        return Server.__call__(self, app, *args, **kwargs)
 
 if __name__ == '__main__':
-    download_models()
     app.run(debug=True, host='0.0.0.0')
