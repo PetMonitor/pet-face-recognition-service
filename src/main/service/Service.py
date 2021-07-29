@@ -12,8 +12,32 @@ DOGS_MODEL_PATH = "src/main/model/dog_facenet.h5"
 app = Flask(__name__)
 manager = Manager(app)
 
+##################### Initial service setup #####################
+
+def download_models():
+    # get first file id for file with extension .h5
+    modelFileIds = FileManager.get_file_ids_for_file_extension('.h5')
+    if len(modelFileIds) == 0:
+        raise Exception("Unable to find files with extension .h5")
+    
+    # For the time being, access the one and only element in modelFileIds
+    # which should be the dogs model
+    # TODO: adapt this to also download the model for cats
+    FileManager.download_file(DOGS_MODEL_PATH, modelFileIds[0])
+    
+
+class CustomServer(Server):
+    def __call__(self, app, *args, **kwargs):
+        print("App started, downloading models from drive...")
+        download_models()
+        print("Model download finished!")
+        return Server.__call__(self, app, *args, **kwargs)
+
+
 # Add the command to your Manager instance
 manager.add_command('runserver', CustomServer())
+
+##################### Application routes #####################
 
 @app.route("/")
 def hello_world():
@@ -47,24 +71,8 @@ def get_dog_embedding():
     print("Predicted embedding for dog image: {}".format(prediction))
     return jsonify(prediction.tolist())
 
-def download_models():
-    # get first file id for file with extension .h5
-    modelFileIds = FileManager.get_file_ids_for_file_extension('.h5')
-    if len(modelFileIds) == 0:
-        raise Exception("Unable to find files with extension .h5")
-    
-    # For the time being, access the one and only element in modelFileIds
-    # which should be the dogs model
-    # TODO: adapt this to also download the model for cats
-    FileManager.download_file(DOGS_MODEL_PATH, modelFileIds[0])
-    
 
-class CustomServer(Server):
-    def __call__(self, app, *args, **kwargs):
-        print("App started, downloading models from drive...")
-        download_models()
-        print("Model download finished!")
-        return Server.__call__(self, app, *args, **kwargs)
+##################### Run app #####################
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
