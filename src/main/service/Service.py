@@ -77,7 +77,5 @@ def get_dog_embedding():
 ##################### Run app #####################
 
 if __name__ == '__main__':
-    environ.get('PORT') is None:
-        port = 5000
-    port = environ['PORT']
+    port = environ['LOCAL_PORT'] if (environ.get('PORT') is None) else environ['PORT']
     app.run(debug=True, host='0.0.0.0', port=port)
