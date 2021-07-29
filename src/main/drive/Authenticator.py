@@ -7,11 +7,11 @@ CREDENTIALS_FILE_NAME = 'credentials.json'
 SCOPE = ['https://www.googleapis.com/auth/drive']
 
 def generate_credentials():
-    print('Credentials env variable set: {}', environ.get('CREDENTIALS') is None)
+    print('Credentials env variable set: {}'.format(environ.get('CREDENTIALS') not is None))
     if environ.get('CREDENTIALS') is None:
         service_account_file = get_filename(CREDENTIALS_FILE_NAME)
         return service_account.Credentials.from_service_account_file(service_account_file, scopes=SCOPE)
-    service_account_info = json.loads(environ.get('CREDENTIALS'))
+    service_account_info = json.loads(environ['CREDENTIALS'])
     return service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPE)
 
 
