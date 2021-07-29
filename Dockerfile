@@ -6,7 +6,6 @@ ADD ./src /app/src
 WORKDIR /app
 
 ENV PYTHONPATH=/app
-ENV CREDENTIALS=$CREDENTIALS
 
 RUN pip3 install -r requirements.txt
 

@@ -1,3 +1,5 @@
 build:
+  config:
+    CREDENTIALS: $CREDENTIALS
   docker:
     web: Dockerfile
