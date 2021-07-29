@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, redirect, request
 from flask_script import Manager, Server
-import json
 from src.main.utils import Utils
 from src.main.drive import FileManager, Authenticator
+from os import environ
+
+import json
 import tensorflow.keras.models as models
 
 DOGS_MODEL_PATH = "src/main/model/dog_facenet.h5"
@@ -75,4 +77,7 @@ def get_dog_embedding():
 ##################### Run app #####################
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    environ.get('PORT') is None:
+        port = 5000
+    port = environ['PORT']
+    app.run(debug=True, host='0.0.0.0', port=port)
