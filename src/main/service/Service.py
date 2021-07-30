@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, redirect, request
-from flask_script import Manager, Server
 from src.main.utils import Utils
 from src.main.drive import FileManager, Authenticator
 from os import environ
@@ -12,7 +11,6 @@ DOGS_MODEL_PATH = "src/main/model/dog_facenet.h5"
 #TODO: add caching for embeddings cause they take some time to process
 
 app = Flask(__name__)
-manager = Manager(app)
 
 ##################### Initial service setup #####################
 
@@ -26,18 +24,6 @@ def download_models():
     # which should be the dogs model
     # TODO: adapt this to also download the model for cats
     FileManager.download_file(DOGS_MODEL_PATH, modelFileIds[0])
-    
-
-class CustomServer(Server):
-    def __call__(self, app, *args, **kwargs):
-        print("App started, downloading models from drive...")
-        download_models()
-        print("Model download finished!")
-        return Server.__call__(self, app, *args, **kwargs)
-
-
-# Add the command to your Manager instance
-manager.add_command('runserver', CustomServer())
 
 ##################### Application routes #####################
 
@@ -77,5 +63,6 @@ def get_dog_embedding():
 ##################### Run app #####################
 
 if __name__ == '__main__':
+    download_models()
     port = environ['LOCAL_PORT'] if (environ.get('PORT') is None) else environ['PORT']
     app.run(debug=True, host='0.0.0.0', port=port)
