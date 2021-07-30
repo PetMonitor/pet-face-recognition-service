@@ -6,9 +6,10 @@ ADD ./src /app/src
 WORKDIR /app
 
 ENV PYTHONPATH=/app
+ENV LOCAL_PORT=5000
 
 RUN pip3 install -r requirements.txt
 
-EXPOSE 5000
+EXPOSE $LOCAL_PORT
 
 CMD ["python3", "/app/src/main/service/Service.py"]
