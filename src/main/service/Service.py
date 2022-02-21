@@ -1,16 +1,20 @@
-from flask import Flask, jsonify, redirect, request
+from flask import Flask, request, jsonify
+from flask_restful import Api
+
 from src.main.utils import Utils
-from src.main.drive import FileManager, Authenticator
+from src.main.drive import FileManager
+from src.main.resources.classifier import PetClassifier
 from os import environ
 
 import json
 import tensorflow.keras.models as models
 
-DOGS_MODEL_PATH = "src/main/model/dog_facenet.h5"
+DOGS_FACENET_MODEL_PATH = "src/main/model/5.12.2021.5._68.37_.h5"
 
 #TODO: add caching for embeddings cause they take some time to process
 
 app = Flask(__name__)
+api = Api(app, prefix='/api/v0')
 
 ##################### Initial service setup #####################
 
@@ -23,7 +27,7 @@ def download_models():
     # For the time being, access the one and only element in modelFileIds
     # which should be the dogs model
     # TODO: adapt this to also download the model for cats
-    FileManager.download_file(DOGS_MODEL_PATH, modelFileIds[0])
+    FileManager.download_file(DOGS_FACENET_MODEL_PATH, modelFileIds[0])
 
 ##################### Application routes #####################
 
@@ -52,13 +56,15 @@ Returns a 128 dimension embedding for each of the provided images.
 """
 @app.route("/dogs/embedding", methods=['POST'])
 def get_dog_embedding():
-    dogs_model = models.load_model(DOGS_MODEL_PATH, custom_objects={'triplet':Utils.triplet,'triplet_acc':Utils.triplet_acc})
+    dogs_model = models.load_model(DOGS_FACENET_MODEL_PATH, custom_objects={'triplet':Utils.triplet,'triplet_acc':Utils.triplet_acc})
     
     images = Utils.process_and_decode_base64_images(request.json['dogs']['images'])
     prediction = dogs_model.predict(images)
     print("Predicted embedding for dog image: {}".format(prediction))
     return jsonify(prediction.tolist())
 
+
+api.add_resource(PetClassifier, "/topk/neighbours", methods=['POST'])
 
 ##################### Run app #####################
 
