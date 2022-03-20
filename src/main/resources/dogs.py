@@ -5,7 +5,7 @@ from flask_restful import request, Resource
 import numpy as np
 from src.main.utils import Utils
 import src.main.utils.Models as Models
-#from sklearn.preprocessing import Normalizer
+from sklearn.preprocessing import Normalizer
 
 MAX_THREADS = 10
 TASK_TIMEOUT_SECONDS = 20
@@ -56,10 +56,9 @@ class DogEmbeddingGenerator(Resource):
             print("Process and decode base 64", flush=True)
             img = Utils.process_and_decode_base64_image(image["photo"])
 
-            img_arr = np.ndarray((1, IMG_SIZE[0], IMG_SIZE[1], 3))
             #TODO: image should be pre-processed
 
-
+            img_arr = np.ndarray((1, IMG_SIZE[0], IMG_SIZE[1], 3))
 
             img_arr[0] = img
             print("Processed and decoded images {}".format(img_arr.shape), flush=True)
@@ -67,12 +66,17 @@ class DogEmbeddingGenerator(Resource):
             # scale RGB values to interval [0,1]
             face_pixels = (img_arr[0] / 255.).astype('float32')
             scaled_img = np.expand_dims(face_pixels, axis=0)
-            embedding =  Models.dogsModel.predict(scaled_img)[0]
+            embedding =  Models.dogsModel.predict(scaled_img)
 
-            #TODO: embedding should be normalized
-            #in_encoder = Normalizer(norm='l2')
-            #embedding = in_encoder.transform(embedding)
-            return embedding.tolist()
+            embedding = np.asarray(embedding)
+
+            # Normalize embedding
+            in_encoder = Normalizer(norm='l2')
+            embedding = in_encoder.transform(embedding)
+
+            print("Calculated embedding {}".format(embedding), flush=True)
+
+            return embedding[0].tolist()
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

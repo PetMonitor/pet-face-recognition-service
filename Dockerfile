@@ -18,7 +18,7 @@ RUN python3 -m pip install -U https://tf.novaal.de/barcelona/tensorflow-2.8.0-cp
 RUN python3 -m pip install -r requirements.txt
 RUN python3 -m pip install keras==2.8.0
 RUN python3 -m pip install numpy
-#RUN python3 -m pip install scikit-learn
+RUN python3 -m pip install scikit-learn
 
 EXPOSE $LOCAL_PORT
 
