@@ -1,15 +1,13 @@
-
-from calendar import c
 from flask_restful import Resource
 from pymongo import MongoClient
 
 client = MongoClient()
 db = client.pet_monitor_db
 
-class PetClassifier(Resource):
+class Ping(Resource):
 
     def __init__(self):
-        super(PetClassifier, self).__init__()
+        super(Ping, self).__init__()
 
-    def post(self):
-        return []
+    def get():
+        return "Uneasy lies the head that wears the crown"

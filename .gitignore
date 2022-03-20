@@ -1,1 +1,4 @@
 .DS_Store
+credentials.json
+__pycache__
+*.h5

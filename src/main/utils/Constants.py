@@ -1,0 +1,4 @@
+from os import environ
+
+DOGS_FACENET_MODEL_FILENAME = environ.get("DOGS_FACENET_MODEL_FILENAME", "5.12.2021.5._68.37_.h5")
+DOGS_FACENET_MODEL_PATH = "/app/src/main/model/" + DOGS_FACENET_MODEL_FILENAME

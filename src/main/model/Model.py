@@ -5,8 +5,8 @@ import pickle
 import numpy as np
 import skimage.io
 import matplotlib.pyplot as plt
-import tensorflow.keras.backend as K
-from tensorflow.keras.preprocessing import image
+#import tensorflow.keras.backend as K
+#from tensorflow.keras.preprocessing import image
 from math import isnan
 
 SIZE = (160,160,3)                               # Size of the input images

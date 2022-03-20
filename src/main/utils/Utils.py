@@ -1,9 +1,10 @@
 import numpy as np 
-import tensorflow.keras.backend as K
-from tensorflow.keras.preprocessing import image
-from tensorflow.io import decode_base64
-from tensorflow.nn import relu
-from tensorflow.image import decode_image, resize, ResizeMethod
+import tensorflow
+#import tensorflow.keras.backend as K
+#from tensorflow.keras.preprocessing import image
+#from tensorflow.io import decode_base64
+#from tensorflow.nn import relu
+#from tensorflow.image import decode_image, resize, ResizeMethod
 
 ALPHA = 0.3
 SIZE = (160,160,3)
@@ -19,30 +20,30 @@ def triplet(y_true, y_pred):
     negative = y_pred[2::3]
  
  	# Distance between anchor/positive and anchor/negative
-    dst_anchor_positive = K.sum(K.square(anchor - positive), -1)
-    dst_anchor_negative = K.sum(K.square(anchor - negative), -1)
+    dst_anchor_positive = tensorflow.keras.backend.sum(tensorflow.keras.backend.square(anchor - positive), -1)
+    dst_anchor_negative = tensorflow.keras.backend.sum(tensorflow.keras.backend.square(anchor - negative), -1)
 
     # minimize distance between anchor and positive embeddings
     # pow(||f(a) - f(p)||,2) + ALPHA <= pow(||f(a) - f(n)||,2)
     # return max(0, dst(ap) - dst(an) + margin)
-    return K.sum(relu(dst_anchor_positive - dst_anchor_negative + ALPHA))
+    return tensorflow.keras.backend.sum(tensorflow.nn.relu(dst_anchor_positive - dst_anchor_negative + ALPHA))
 
 def triplet_acc(y_true, y_pred):
     anchor = y_pred[0::3]
     positive = y_pred[1::3]
     negative = y_pred[2::3]
     
-    ap = K.sum(K.square(anchor - positive), -1)
-    an = K.sum(K.square(anchor - negative), -1)
+    ap = tensorflow.keras.backend.sum(tensorflow.keras.backend.square(anchor - positive), -1)
+    an = tensorflow.keras.backend.sum(tensorflow.keras.backend.square(anchor - negative), -1)
     
-    return K.less(ap + ALPHA, an)
+    return tensorflow.keras.backend.less(ap + ALPHA, an)
 
 
 def load_images(filenames):
     h,w,c = SIZE
     images = np.empty((len(filenames), h, w, c))
     for i, f in enumerate(filenames):
-      images[i] = np.array(image.load_img(f, target_size = SIZE))/255.0
+      images[i] = np.array(tensorflow.keras.preprocessing.load_img(f, target_size = SIZE))/255.0
     return images
 
 def transform_to_url_safe(img_str):
@@ -60,16 +61,20 @@ def transform_to_url_safe(img_str):
 def process_and_decode_base64_images(image_strings, shape=SIZE):
     h,w,c = SIZE
     images = np.empty((len(image_strings), h, w, c))
-    #try:
     for i, img_str in enumerate(image_strings):
-        img = decode_base64(transform_to_url_safe(img_str))
-        img = decode_image(img, channels=3)
-        img = resize(img, [shape[0],shape[1]], method=ResizeMethod.BILINEAR)
+        img = tensorflow.io.decode_base64(transform_to_url_safe(img_str))
+        img = tensorflow.image.decode_image(img, channels=3)
+        img = tensorflow.image.resize(img, [shape[0],shape[1]], method=tensorflow.image.ResizeMethod.BILINEAR)
         images[i] = img
     return images
-    #except Exception as ex:
-    #    print("Error loading base64 image: {}".format(ex))
-    return np.empty(0)
+
+def process_and_decode_base64_image(image_string, shape=SIZE):
+    img = tensorflow.io.decode_base64(transform_to_url_safe(image_string))
+    img = tensorflow.image.decode_image(img, channels=3)
+    img = tensorflow.image.resize_with_pad(img, shape[0], shape[1], method=tensorflow.image.ResizeMethod.BILINEAR)
+    print("Image resized to {}".format(img.shape))
+    return img
+
 
 def predict_generator(filenames, batch_size=32):
     for i in range(0,len(filenames),batch_size):

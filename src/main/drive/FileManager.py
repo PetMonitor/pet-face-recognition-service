@@ -12,13 +12,12 @@ def list_all_files():
     #print('RESPONSE WAS {0}'.format(fileList))
     return fileList
 
-def get_file_ids_for_file_extension(extension):
+def get_file_id_for_filename(filename):
     fileList = list_all_files()['files']
-    fileIdsForExtension = []
     for file in fileList:
-        if extension in file['name']:
-            fileIdsForExtension.append(file['id'])
-    return fileIdsForExtension
+        if filename == file['name']:
+            return file['id']
+    raise FileNotFoundError("No model found for name {}".format(filename))
 
 def download_file(targetPath, fileId):
     credentials = Authenticator.generate_credentials()
