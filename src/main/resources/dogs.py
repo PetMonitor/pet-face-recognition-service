@@ -1,15 +1,18 @@
 import sys, os
-from flask import jsonify
-from flask_restful import request, Resource
+import requests
 
 import numpy as np
+from flask import jsonify
+from flask_restful import request, Resource
+from sklearn.preprocessing import Normalizer
+
 from src.main.utils import Utils
 import src.main.utils.Models as Models
-from sklearn.preprocessing import Normalizer
 
 MAX_THREADS = 10
 TASK_TIMEOUT_SECONDS = 20
 IMG_SIZE = (160,160)
+IMG_PREPROCESSING_SERVICE_URL = os.environ.get("PREPROCESSING_SERVICE_URL", "http://host.docker.internal:5002/api/v0")
 
 class DogEmbeddingGenerator(Resource):
 
@@ -53,10 +56,14 @@ class DogEmbeddingGenerator(Resource):
 
     def predictAndSaveEmbedding(self, image):
         try:
-            print("Process and decode base 64", flush=True)
-            img = Utils.process_and_decode_base64_image(image["photo"])
+            print("Send request to pre-process image", flush=True)
+            #Pre-process image
+            preprocessed_img = requests.post(IMG_PREPROCESSING_SERVICE_URL + "/preprocessed-images", data={
+                "petImages": image["photo"]
+            })
 
-            #TODO: image should be pre-processed
+            print("Process and decode base 64", flush=True)
+            img = Utils.process_and_decode_base64_image(preprocessed_img.json()["petImages"][0][0])
 
             img_arr = np.ndarray((1, IMG_SIZE[0], IMG_SIZE[1], 3))
 
