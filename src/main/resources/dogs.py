@@ -56,18 +56,25 @@ class DogEmbeddingGenerator(Resource):
 
     def predictAndSaveEmbedding(self, image):
         try:
-            print("Send request to pre-process image", flush=True)
+            print("Send request to pre-process image...", flush=True)
             #Pre-process image
             preprocessed_img = requests.post(IMG_PREPROCESSING_SERVICE_URL + "/preprocessed-images", data={
                 "petImages": image["photo"]
             })
+            preprocessed_img = preprocessed_img.json()["petImages"][0]
 
-            print("Process and decode base 64", flush=True)
-            img = Utils.process_and_decode_base64_image(preprocessed_img.json()["petImages"][0][0])
+
+            if (len(preprocessed_img) > 0):
+                preprocessed_img = Utils.process_and_decode_base64_image(preprocessed_img[0])
+            else:
+                print("Preprocess service returned no results. Using image without preprocessing.")
+                preprocessed_img = Utils.process_and_decode_base64_image(image["photo"])
+
+            print("Process and decode base 64...", flush=True)
 
             img_arr = np.ndarray((1, IMG_SIZE[0], IMG_SIZE[1], 3))
 
-            img_arr[0] = img
+            img_arr[0] = preprocessed_img
             print("Processed and decoded images {}".format(img_arr.shape), flush=True)
 
             # scale RGB values to interval [0,1]
