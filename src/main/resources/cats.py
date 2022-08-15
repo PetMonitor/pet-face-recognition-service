@@ -1,8 +1,4 @@
 from flask_restful import Resource
-from pymongo import MongoClient
-
-client = MongoClient()
-db = client.pet_monitor_db
 
 class CatsEmbeddingGenerator(Resource):
 

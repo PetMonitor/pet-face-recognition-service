@@ -6,5 +6,5 @@ google-auth
 Keras==2.4.3
 Numpy<=1.21.4
 Pillow==7.1.2
-pymongo==4.0
 Requests
+protobuf==3.20.*
